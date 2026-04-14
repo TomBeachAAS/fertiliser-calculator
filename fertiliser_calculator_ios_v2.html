@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Liquid Fertiliser Calculator</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#5b6472;
+      --accent:#1f6feb;
+      --border:#d9e0ea;
+      --shadow:0 8px 24px rgba(31,41,55,.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      padding:16px;
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+    }
+    h1{
+      font-size:clamp(1.8rem,4vw,2.4rem);
+      margin:0 0 6px 0;
+    }
+    .subtitle{
+      color:var(--muted);
+      margin:0 0 18px 0;
+      line-height:1.45;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1.4fr 1fr;
+      gap:16px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .card h2{
+      font-size:1rem;
+      margin:0 0 12px 0;
+    }
+    .inputs{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+    }
+    label{
+      display:block;
+      font-size:.92rem;
+      font-weight:600;
+      margin:0 0 6px 0;
+    }
+    input, select, button, textarea{
+      font:inherit;
+    }
+    input, select{
+      width:100%;
+      min-height:44px;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:#fff;
+      color:var(--text);
+    }
+    .muted{
+      color:var(--muted);
+      font-size:.92rem;
+      margin-top:8px;
+    }
+    .summary-value{
+      font-size:1.45rem;
+      font-weight:700;
+      margin:4px 0 14px 0;
+    }
+    .small-value{
+      font-size:1.15rem;
+      font-weight:700;
+      margin:4px 0 14px 0;
+    }
+    .section{
+      margin-top:16px;
+    }
+    .table-head, .row{
+      display:grid;
+      grid-template-columns:1.2fr 1.2fr 1fr 1fr .7fr auto;
+      gap:8px;
+      align-items:end;
+    }
+    .cell{
+      width:100%;
+    }
+    .table-head{
+      padding:0 0 8px 0;
+      border-bottom:1px solid var(--border);
+      color:var(--muted);
+      font-weight:700;
+      font-size:.9rem;
+    }
+    .row{
+      padding:10px 0;
+      border-bottom:1px solid #eef2f7;
+      align-items:center;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+    button{
+      min-height:44px;
+      border:none;
+      border-radius:12px;
+      padding:10px 16px;
+      cursor:pointer;
+    }
+    .primary{
+      background:var(--accent);
+      color:#fff;
+      font-weight:700;
+    }
+    .secondary{
+      background:#eaf1ff;
+      color:#184ea6;
+      font-weight:600;
+    }
+    .danger{
+      background:#fff1f2;
+      color:#b42318;
+      font-weight:600;
+      padding:10px 12px;
+    }
+    .results{
+      margin-top:16px;
+    }
+    .pressure{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:12px;
+      flex-wrap:wrap;
+      padding-bottom:12px;
+      border-bottom:1px solid var(--border);
+      margin-bottom:12px;
+    }
+    .pressure-title{
+      color:var(--accent);
+      font-size:.95rem;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+    .pressure-value{
+      font-size:clamp(2rem,6vw,2.6rem);
+      font-weight:800;
+      line-height:1;
+      margin-top:4px;
+    }
+    .pressure-note{
+      text-align:right;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+    textarea{
+      width:100%;
+      min-height:320px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      background:#fff;
+      color:var(--text);
+      resize:vertical;
+      white-space:pre-wrap;
+    }
+    .footer-note{
+      color:var(--muted);
+      font-size:.9rem;
+      margin-top:12px;
+    }
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+      .inputs{grid-template-columns:repeat(2,1fr)}
+      .table-head{display:none}
+      .row{
+        grid-template-columns:1fr;
+        border:1px solid var(--border);
+        border-radius:14px;
+        padding:12px;
+        margin-top:10px;
+      }
+      .row .cell::before{
+        content:attr(data-label);
+        display:block;
+        font-size:.82rem;
+        color:var(--muted);
+        font-weight:700;
+        margin-bottom:4px;
+      }
+      .row button{width:100%}
+      .pressure-note{text-align:left}
+    }
+    @media (max-width: 540px){
+      body{padding:12px}
+      .card{padding:14px}
+      .inputs{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Liquid Fertiliser Calculator</h1>
+    <p class="subtitle">
+      iPhone and iPad friendly version of the calculator. Open in Safari and optionally add it to your home screen.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Application Setup</h2>
+        <div class="inputs">
+          <div>
+            <label for="rate">Target rate (L/ha)</label>
+            <input id="rate" type="number" inputmode="decimal" step="any" value="200">
+          </div>
+          <div>
+            <label for="speed">Speed (km/h)</label>
+            <input id="speed" type="number" inputmode="decimal" step="any" value="5">
+          </div>
+          <div>
+            <label for="width">Working width (m)</label>
+            <input id="width" type="number" inputmode="decimal" step="any" value="3">
+          </div>
+          <div>
+            <label for="density">Density factor</label>
+            <input id="density" type="number" inputmode="decimal" step="any" value="1.00">
+          </div>
+        </div>
+        <div class="muted">Use 1.00 unless you know your fertiliser flows differently from the nozzle chart.</div>
+      </div>
+
+      <div class="card">
+        <h2>Quick Summary</h2>
+        <div>
+          <div class="muted">Required boom flow</div>
+          <div class="summary-value" id="summaryBoomFlow">-</div>
+        </div>
+        <div>
+          <div class="muted">Total nozzle quantity</div>
+          <div class="small-value" id="summaryQty">-</div>
+        </div>
+        <div>
+          <div class="muted">Average flow per nozzle</div>
+          <div class="small-value" id="summaryNozzleFlow">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Nozzle Inputs</h2>
+      <div class="table-head">
+        <div>Preset</div>
+        <div>Name</div>
+        <div>Chart flow L/min</div>
+        <div>Chart pressure bar</div>
+        <div>Qty</div>
+        <div>Action</div>
+      </div>
+      <div id="rows"></div>
+
+      <div class="actions">
+        <button class="secondary" id="addRow">Add Nozzle Row</button>
+        <button class="primary" id="calculateBtn">Calculate</button>
+        <button class="secondary" id="clearBtn">Clear Results</button>
+      </div>
+      <div class="footer-note">Add different nozzle types or duplicate rows to compare options.</div>
+    </div>
+
+    <div class="card results">
+      <h2>Results</h2>
+      <div class="pressure">
+        <div>
+          <div class="pressure-title">REQUIRED / WORKING PRESSURE</div>
+          <div class="pressure-value" id="workingPressure">-</div>
+        </div>
+        <div class="pressure-note">
+          <div>Shown for nozzle row</div>
+          <div id="workingPressureNote" style="font-weight:700;color:var(--text)">Add nozzle data and tap Calculate</div>
+        </div>
+      </div>
+      <textarea id="results" readonly>Enter your data and tap Calculate.</textarea>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_NOZZLES = {
+      "Green 015": { flow: 0.40, pressure: 1.0 },
+      "Yellow 02": { flow: 0.54, pressure: 1.0 },
+      "Purple 025": { flow: 0.68, pressure: 1.0 },
+      "Blue 03": { flow: 0.81, pressure: 1.0 },
+      "Red 04": { flow: 1.03, pressure: 1.0 },
+      "Brown 05": { flow: 1.35, pressure: 1.0 },
+      "Grey 06": { flow: 1.62, pressure: 1.0 }
+    };
+
+    const rowsEl = document.getElementById('rows');
+    const rateEl = document.getElementById('rate');
+    const speedEl = document.getElementById('speed');
+    const widthEl = document.getElementById('width');
+    const densityEl = document.getElementById('density');
+
+    function safeFloat(value, fieldName){
+      const normalised = String(value).trim().replace(',', '.');
+      const n = parseFloat(normalised);
+      if (Number.isNaN(n)) throw new Error(fieldName + " must be a number.");
+      return n;
+    }
+
+    function calculateTargetFlow(rate, speed, width){
+      rate = safeFloat(rate, "Target rate");
+      speed = safeFloat(speed, "Speed");
+      width = safeFloat(width, "Working width");
+      if (rate <= 0) throw new Error("Target rate must be greater than zero.");
+      if (speed <= 0) throw new Error("Speed must be greater than zero.");
+      if (width <= 0) throw new Error("Working width must be greater than zero.");
+      return (rate * speed * width) / 600.0;
+    }
+
+    function calculateNozzlePressure(targetPerNozzleFlow, chartFlow, chartPressure, densityFactor){
+      targetPerNozzleFlow = safeFloat(targetPerNozzleFlow, "Target flow per nozzle");
+      chartFlow = safeFloat(chartFlow, "Chart flow");
+      chartPressure = safeFloat(chartPressure, "Chart pressure");
+      densityFactor = safeFloat(densityFactor, "Density factor");
+      const correctedFlow = chartFlow * densityFactor;
+      if (targetPerNozzleFlow <= 0) throw new Error("Target flow per nozzle must be greater than zero.");
+      if (chartPressure <= 0) throw new Error("Chart pressure must be greater than zero.");
+      if (correctedFlow <= 0) throw new Error("Corrected nozzle flow must be greater than zero.");
+      return chartPressure * Math.pow(targetPerNozzleFlow / correctedFlow, 2);
+    }
+
+    function createInput(type, value, dataLabel, step="any"){
+      const input = document.createElement('input');
+      input.type = type;
+      input.step = step;
+      input.value = value;
+      input.className = 'field';
+      if (type === 'number') {
+        input.setAttribute('inputmode', step === '1' ? 'numeric' : 'decimal');
+      }
+      input.addEventListener('input', updateQuickSummary);
+      return input;
+    }
+
+    function createSelect(dataLabel){
+      const select = document.createElement('select');
+      select.className = 'field';
+      select.setAttribute('data-label', dataLabel);
+
+      const custom = document.createElement('option');
+      custom.value = "Custom";
+      custom.textContent = "Custom";
+      select.appendChild(custom);
+
+      Object.keys(DEFAULT_NOZZLES).forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        select.appendChild(opt);
+      });
+
+      select.addEventListener('change', () => {
+        const row = select.closest('.row');
+        const nameInput = row.querySelector('.name');
+        const flowInput = row.querySelector('.flow');
+        const pressureInput = row.querySelector('.pressure');
+        if (DEFAULT_NOZZLES[select.value]) {
+          nameInput.value = select.value;
+          flowInput.value = DEFAULT_NOZZLES[select.value].flow.toFixed(3);
+          pressureInput.value = DEFAULT_NOZZLES[select.value].pressure.toFixed(3);
+        }
+        updateQuickSummary();
+      });
+
+      return select;
+    }
+
+    function addRow(presetName = "Custom", quantity = "1"){
+      const row = document.createElement('div');
+      row.className = 'row';
+
+      const preset = createSelect("Preset");
+      preset.value = presetName;
+
+      const name = createInput('text', presetName === "Custom" ? `Nozzle ${rowsEl.children.length + 1}` : presetName, "Name");
+      name.classList.add('name');
+
+      const flowDefault = DEFAULT_NOZZLES[presetName]?.flow ?? 1.35;
+      const pressureDefault = DEFAULT_NOZZLES[presetName]?.pressure ?? 1.0;
+
+      const flow = createInput('number', Number(flowDefault).toFixed(3), "Chart flow L/min");
+      flow.classList.add('flow');
+
+      const pressure = createInput('number', Number(pressureDefault).toFixed(3), "Chart pressure bar");
+      pressure.classList.add('pressure');
+
+      const qty = createInput('number', quantity, "Qty", "1");
+      qty.classList.add('qty');
+
+      const remove = document.createElement('button');
+      remove.className = 'danger field';
+      remove.setAttribute('data-label', 'Action');
+      remove.textContent = 'Remove';
+      remove.addEventListener('click', () => {
+        if (rowsEl.children.length <= 1) {
+          alert('At least one nozzle row is required.');
+          return;
+        }
+        row.remove();
+        updateQuickSummary();
+      });
+
+      const presetCell = document.createElement('div');
+      presetCell.className = 'cell';
+      presetCell.setAttribute('data-label', 'Preset');
+      presetCell.appendChild(preset);
+
+      const nameCell = document.createElement('div');
+      nameCell.className = 'cell';
+      nameCell.setAttribute('data-label', 'Name');
+      nameCell.appendChild(name);
+
+      const flowCell = document.createElement('div');
+      flowCell.className = 'cell';
+      flowCell.setAttribute('data-label', 'Chart flow L/min');
+      flowCell.appendChild(flow);
+
+      const pressureCell = document.createElement('div');
+      pressureCell.className = 'cell';
+      pressureCell.setAttribute('data-label', 'Chart pressure bar');
+      pressureCell.appendChild(pressure);
+
+      const qtyCell = document.createElement('div');
+      qtyCell.className = 'cell';
+      qtyCell.setAttribute('data-label', 'Qty');
+      qtyCell.appendChild(qty);
+
+      const actionCell = document.createElement('div');
+      actionCell.className = 'cell';
+      actionCell.setAttribute('data-label', 'Action');
+      actionCell.appendChild(remove);
+
+      row.appendChild(presetCell);
+      row.appendChild(nameCell);
+      row.appendChild(flowCell);
+      row.appendChild(pressureCell);
+      row.appendChild(qtyCell);
+      row.appendChild(actionCell);
+      rowsEl.appendChild(row);
+
+      if (DEFAULT_NOZZLES[presetName]) {
+        name.value = presetName;
+      }
+
+      updateQuickSummary();
+    }
+
+    function getApplicationInputs(){
+      const densityFactor = safeFloat(densityEl.value, "Density factor");
+      if (densityFactor <= 0) throw new Error("Density factor must be greater than zero.");
+      return {
+        rate_l_ha: safeFloat(rateEl.value, "Target rate"),
+        speed_kph: safeFloat(speedEl.value, "Speed"),
+        width_m: safeFloat(widthEl.value, "Working width"),
+        density_factor: densityFactor
+      };
+    }
+
+    function getNozzleInputs(){
+      const data = [...rowsEl.children].map((row, idx) => {
+        const name = row.querySelector('.name').value.trim() || `Custom ${idx + 1}`;
+        const flow = safeFloat(row.querySelector('.flow').value, `Flow for ${name}`);
+        const pressure = safeFloat(row.querySelector('.pressure').value, `Pressure for ${name}`);
+        const quantityFloat = safeFloat(row.querySelector('.qty').value, `Quantity for ${name}`);
+
+        if (flow <= 0) throw new Error(`Flow for ${name} must be greater than zero.`);
+        if (pressure <= 0) throw new Error(`Pressure for ${name} must be greater than zero.`);
+        if (quantityFloat <= 0 || Math.floor(quantityFloat) !== quantityFloat) {
+          throw new Error(`Quantity for ${name} must be a whole number greater than zero.`);
+        }
+
+        return {
+          name,
+          flow,
+          pressure,
+          quantity: quantityFloat
+        };
+      });
+
+      const totalQty = data.reduce((sum, item) => sum + item.quantity, 0);
+      if (totalQty <= 0) throw new Error("Total nozzle quantity must be greater than zero.");
+      return data;
+    }
+
+    function updateQuickSummary(){
+      try{
+        const app = getApplicationInputs();
+        const nozzleData = getNozzleInputs();
+        const targetBoomFlow = calculateTargetFlow(app.rate_l_ha, app.speed_kph, app.width_m);
+        const totalQty = nozzleData.reduce((sum, item) => sum + item.quantity, 0);
+        const avgFlow = targetBoomFlow / totalQty;
+
+        document.getElementById('summaryBoomFlow').textContent = targetBoomFlow.toFixed(2) + ' L/min';
+        document.getElementById('summaryQty').textContent = String(totalQty);
+        document.getElementById('summaryNozzleFlow').textContent = avgFlow.toFixed(3) + ' L/min';
+      } catch {
+        document.getElementById('summaryBoomFlow').textContent = '-';
+        document.getElementById('summaryQty').textContent = '-';
+        document.getElementById('summaryNozzleFlow').textContent = '-';
+      }
+    }
+
+    function clearResults(){
+      document.getElementById('results').value = 'Enter your data and tap Calculate.';
+      document.getElementById('workingPressure').textContent = '-';
+      document.getElementById('workingPressureNote').textContent = 'Add nozzle data and tap Calculate';
+      updateQuickSummary();
+    }
+
+    function calculate(){
+      try{
+        const app = getApplicationInputs();
+        const nozzleData = getNozzleInputs();
+        const targetBoomFlow = calculateTargetFlow(app.rate_l_ha, app.speed_kph, app.width_m);
+        const totalQty = nozzleData.reduce((sum, item) => sum + item.quantity, 0);
+        const targetPerNozzleFlow = targetBoomFlow / totalQty;
+
+        const lines = [
+          'LIQUID FERTILISER APPLICATION CALCULATION',
+          '==========================================================',
+          '',
+          `Target rate:        ${app.rate_l_ha.toFixed(2)} L/ha`,
+          `Speed:              ${app.speed_kph.toFixed(2)} km/h`,
+          `Working width:      ${app.width_m.toFixed(2)} m`,
+          `Density factor:     ${app.density_factor.toFixed(3)}`,
+          `Total nozzle qty:   ${totalQty}`,
+          `Required boom flow: ${targetBoomFlow.toFixed(3)} L/min`,
+          `Flow per nozzle:    ${targetPerNozzleFlow.toFixed(3)} L/min`,
+          '',
+          'NOZZLE RESULTS',
+          '----------------------------------------------------------'
+        ];
+
+        let firstPressure = null;
+        let firstName = null;
+
+        nozzleData.forEach((item, index) => {
+          const pressure = calculateNozzlePressure(
+            targetPerNozzleFlow,
+            item.flow,
+            item.pressure,
+            app.density_factor
+          );
+
+          if (firstPressure === null){
+            firstPressure = pressure;
+            firstName = `${index + 1} (${item.name})`;
+          }
+
+          lines.push(
+            `Row ${index + 1} - ${item.name}  |  Qty: ${item.quantity}`,
+            `  Chart flow:            ${item.flow.toFixed(3)} L/min @ ${item.pressure.toFixed(3)} bar`,
+            `  REQUIRED pressure:     ${pressure.toFixed(3)} bar`,
+            ''
+          );
+        });
+
+        if (firstPressure !== null){
+          document.getElementById('workingPressure').textContent = firstPressure.toFixed(3) + ' bar';
+          document.getElementById('workingPressureNote').textContent = firstName;
+        }
+
+        document.getElementById('results').value = lines.join('\n');
+        updateQuickSummary();
+      } catch (err){
+        document.getElementById('workingPressure').textContent = '-';
+        document.getElementById('workingPressureNote').textContent = 'Check inputs';
+        alert(err.message);
+      }
+    }
+
+    document.getElementById('addRow').addEventListener('click', () => addRow());
+    document.getElementById('calculateBtn').addEventListener('click', calculate);
+    document.getElementById('clearBtn').addEventListener('click', clearResults);
+    [rateEl, speedEl, widthEl, densityEl].forEach(el => el.addEventListener('input', updateQuickSummary));
+
+    addRow('Brown 05', '6');
+    clearResults();
+  </script>
+</body>
+</html>
